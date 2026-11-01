@@ -24,7 +24,7 @@ Client components                Server components (pages, layouts)
 | `src/trpc/client.tsx` | Browser tRPC client and `TRPCReactProvider`. |
 | `src/trpc/query-client.ts` | Shared `QueryClient` defaults (stale time, superjson (de)hydration). |
 | `src/i18n/` | Locales, message catalogs, server/client helpers. See [i18n.md](i18n.md). |
-| `src/proxy.ts` | Redirects locale-less URLs to `/{locale}`. |
+| `src/proxy.ts` | Maps URLs onto `app/[locale]`: English without a prefix (rewrite), `/pt` and `/es` with one. |
 | `src/app/[locale]/` | Pages, root layout, error and not-found boundaries. |
 | `src/components/`, `src/hooks/` | UI. |
 | `src/theme.ts` | Mantine theme (mobile-first sizes). |
