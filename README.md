@@ -2,6 +2,8 @@
 
 A small task manager built with Next.js and tRPC. Tasks live in server memory, the list is server-rendered, and the same Zod schema validates input in the browser and on the server.
 
+**Live demo:** https://task-manager-trpc-lemon.vercel.app (deployed on Vercel; tasks reset whenever the server restarts)
+
 ## Features
 
 - Create, list, edit and delete tasks over tRPC, with validation and meaningful errors
