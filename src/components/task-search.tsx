@@ -4,26 +4,32 @@ import { CloseButton, Loader, TextInput } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
-// The term lives in the URL (?q=) so search results are server-rendered and
-// shareable; the list reads it from there.
+// The term lives in the list's URL (/?q=) so results are server-rendered and
+// shareable. The box sits in the header, so searching from another page
+// navigates to the list.
 export function TaskSearch() {
 	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
-	const [value, setValue] = useState(searchParams.get("q") ?? "");
+	const onList = usePathname() === "/";
+	const urlTerm = useSearchParams().get("q") ?? "";
+	const listTerm = onList ? urlTerm : "";
+	const [value, setValue] = useState(listTerm);
 	const [isPending, startTransition] = useTransition();
 
+	// Follow URL changes made elsewhere (leaving the list, back/forward), but
+	// don't fight the user's own typing, e.g. a trailing space.
+	useEffect(() => {
+		setValue((current) => (current.trim() === listTerm ? current : listTerm));
+	}, [listTerm]);
+
 	const updateUrl = useDebouncedCallback((term: string) => {
-		const params = new URLSearchParams(searchParams);
-		if (term.trim()) params.set("q", term.trim());
-		else params.delete("q");
-		const query = params.toString();
+		const q = term.trim();
+		if (!onList && !q) return;
+		const href = q ? `/?q=${encodeURIComponent(q)}` : "/";
 		startTransition(() => {
-			router.replace(query ? `${pathname}?${query}` : pathname, {
-				scroll: false,
-			});
+			if (onList) router.replace(href, { scroll: false });
+			else router.push(href);
 		});
 	}, 300);
 
@@ -36,7 +42,7 @@ export function TaskSearch() {
 		<TextInput
 			type="search"
 			aria-label="Search tasks"
-			placeholder="Search by title or description"
+			placeholder="Search tasks"
 			leftSection={<MagnifyingGlassIcon />}
 			rightSection={
 				isPending ? (
@@ -63,7 +69,7 @@ export function TaskSearchFallback() {
 	return (
 		<TextInput
 			aria-label="Search tasks"
-			placeholder="Search by title or description"
+			placeholder="Search tasks"
 			leftSection={<MagnifyingGlassIcon />}
 			disabled
 		/>

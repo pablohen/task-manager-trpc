@@ -1,9 +1,7 @@
-import { Group, Stack, Title } from "@mantine/core";
+import { Stack, Title } from "@mantine/core";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { LinkButton } from "@/components/link-button";
 import { TaskList, TaskListSkeleton } from "@/components/task-list";
-import { TaskSearch, TaskSearchFallback } from "@/components/task-search";
 import {
 	getNextTaskCursor,
 	TASKS_PAGE_SIZE,
@@ -14,13 +12,7 @@ import { getQueryClient, HydrateClient, trpc } from "@/trpc/server";
 export default function HomePage({ searchParams }: PageProps<"/">) {
 	return (
 		<Stack>
-			<Group justify="space-between">
-				<Title order={1}>Tasks</Title>
-				<LinkButton href="/tasks/new">New task</LinkButton>
-			</Group>
-			<Suspense fallback={<TaskSearchFallback />}>
-				<TaskSearch />
-			</Suspense>
+			<Title order={1}>Tasks</Title>
 			<Suspense fallback={<TaskListSkeleton />}>
 				<PrefetchedTaskList searchParams={searchParams} />
 			</Suspense>
