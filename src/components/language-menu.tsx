@@ -2,7 +2,7 @@
 
 import { ActionIcon, Menu } from "@mantine/core";
 import { CheckIcon, TranslateIcon } from "@phosphor-icons/react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useIntl } from "react-intl";
 import { useLocale } from "@/i18n/client";
 import {
@@ -15,15 +15,17 @@ import {
 export function LanguageMenu() {
 	const intl = useIntl();
 	const router = useRouter();
-	const pathname = usePathname();
 	const current = useLocale();
 
 	const switchTo = (locale: Locale) => {
 		// Remembered so the proxy picks it for locale-less URLs next time.
 		// biome-ignore lint/suspicious/noDocumentCookie: a plain preference cookie
 		document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=31536000; samesite=lax`;
+		// Read at click time: usePathname would need a Suspense boundary on
+		// dynamic routes just to render this button.
+		const { pathname, search } = window.location;
 		const rest = pathname.slice(`/${current}`.length);
-		router.replace(`/${locale}${rest}${window.location.search}`, {
+		router.replace(`/${locale}${rest}${search}`, {
 			scroll: false,
 		});
 	};
