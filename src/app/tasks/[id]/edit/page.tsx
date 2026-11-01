@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { TaskForm } from "@/components/task-form";
 import { caller } from "@/trpc/server";
 
@@ -13,6 +14,9 @@ export default function EditTaskPage({
 }: PageProps<"/tasks/[id]/edit">) {
 	return (
 		<Stack>
+			<PageBreadcrumbs
+				items={[{ label: "Tasks", href: "/" }, { label: "Edit task" }]}
+			/>
 			<Title order={1}>Edit task</Title>
 			<Suspense fallback={<Skeleton height={220} radius="md" />}>
 				<EditTaskForm params={params} />
