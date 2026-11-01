@@ -38,7 +38,7 @@ export function TaskCard({
 						{dateFormat.format(task.createdAt)}
 					</Text>
 				</Stack>
-				<Group gap="xs" wrap="nowrap">
+				<Group gap={4} wrap="nowrap">
 					<Tooltip label="Edit">
 						<ActionIcon
 							component={Link}
@@ -46,7 +46,7 @@ export function TaskCard({
 							variant="subtle"
 							aria-label={`Edit “${task.title}”`}
 						>
-							<PencilSimpleIcon />
+							<PencilSimpleIcon size={20} />
 						</ActionIcon>
 					</Tooltip>
 					<Tooltip label="Delete">
@@ -56,7 +56,7 @@ export function TaskCard({
 							aria-label={`Delete “${task.title}”`}
 							onClick={() => onDelete(task)}
 						>
-							<TrashIcon />
+							<TrashIcon size={20} />
 						</ActionIcon>
 					</Tooltip>
 				</Group>
