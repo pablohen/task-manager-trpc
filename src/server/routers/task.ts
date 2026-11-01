@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { taskInputSchema } from "../tasks/schema";
+import { TASKS_PAGE_SIZE, taskInputSchema } from "../tasks/schema";
 import { publicProcedure, router } from "../trpc";
 
 const idInput = z.object({ id: z.uuid() });
@@ -12,7 +12,7 @@ export const taskRouter = router({
 	list: publicProcedure
 		.input(
 			z.object({
-				limit: z.number().int().min(1).max(50).default(10),
+				limit: z.number().int().min(1).max(50).default(TASKS_PAGE_SIZE),
 				cursor: z.string().regex(/^\d+$/, "Invalid cursor").nullish(),
 			}),
 		)

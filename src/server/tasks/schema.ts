@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Shared by the tRPC router and the form, so client and server validate the same way.
 export const taskInputSchema = z.object({
 	title: z
 		.string()
@@ -17,7 +16,6 @@ export const taskInputSchema = z.object({
 });
 
 export type TaskInput = z.output<typeof taskInputSchema>;
-export type TaskFormValues = z.input<typeof taskInputSchema>;
 
 export type Task = {
 	id: string;
@@ -28,6 +26,6 @@ export type Task = {
 
 export type TaskPage = { items: Task[]; nextCursor: string | null };
 
-// Used by both the server prefetch and the client query; they must match.
+// Shared by the server prefetch and the client query.
 export const TASKS_PAGE_SIZE = 10;
 export const getNextTaskCursor = (page: TaskPage) => page.nextCursor;

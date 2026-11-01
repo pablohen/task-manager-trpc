@@ -54,7 +54,7 @@ src/
 
 **List page.** The server component calls the router in-process (no HTTP round trip) to prefetch the first page into a per-request QueryClient. It then dehydrates that cache into the HTML. On the client, `useSuspenseInfiniteQuery` picks up the hydrated data without fetching again. A sentinel element at the bottom of the list fetches the next page when it scrolls into view.
 
-**Delete.** Each delete asks for confirmation. The task is removed from the cache right away; on failure the list is restored and the server's error is shown. A notification reports success or failure either way.
+**Delete.** Each delete asks for confirmation. The task is removed from the cache right away; on failure the list is restored and the server's error is shown.
 
 **Form.** A single `TaskForm` handles both create and edit. react-hook-form validates with the shared schema through `zodResolver`, so an empty or whitespace-only title is caught before any request is sent. Server errors are shown either inline on the matching field or as a notification. The submit button stays disabled while saving.
 
