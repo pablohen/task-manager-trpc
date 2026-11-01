@@ -25,3 +25,9 @@ export type Task = {
 	description?: string;
 	createdAt: Date;
 };
+
+export type TaskPage = { items: Task[]; nextCursor: string | null };
+
+// Used by both the server prefetch and the client query; they must match.
+export const TASKS_PAGE_SIZE = 10;
+export const getNextTaskCursor = (page: TaskPage) => page.nextCursor;

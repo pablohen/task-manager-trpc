@@ -1,9 +1,7 @@
-import type { Task, TaskInput } from "./schema";
+import type { Task, TaskInput, TaskPage } from "./schema";
 import { seedTasks } from "./seed";
 
 type Entry = { task: Task; seq: number };
-
-export type TaskPage = { items: Task[]; nextCursor: string | null };
 
 /**
  * In-memory task store. Every task gets an increasing sequence number and the
