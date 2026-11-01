@@ -11,6 +11,10 @@
 | `pnpm lint` / `pnpm format` | Biome check / fix |
 | `pnpm typecheck` | `next typegen` (route and root-param types) then `tsc` |
 
+## CI
+
+`.github/workflows/ci.yml` runs on every push and pull request to `main`: frozen install, `pnpm lint`, `pnpm typecheck`, `pnpm coverage` and `pnpm build`, on Node 26 (the version Vercel deploys with). Vercel deploys `main` separately through its Git integration.
+
 ## Tests
 
 Unit tests cover the backend and i18n:

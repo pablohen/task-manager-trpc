@@ -1,5 +1,7 @@
 # Task Manager
 
+[![CI](https://github.com/pablohen/task-manager-trpc/actions/workflows/ci.yml/badge.svg)](https://github.com/pablohen/task-manager-trpc/actions/workflows/ci.yml)
+
 A small task manager built with Next.js and tRPC. Tasks live in server memory, the list is server-rendered, and the same Zod schema validates input in the browser and on the server.
 
 **Live demo:** https://task-manager-trpc-lemon.vercel.app (deployed on Vercel; tasks reset whenever the server restarts)
