@@ -10,7 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 		<TRPCReactProvider>
 			<MantineProvider>
 				<ModalsProvider>
-					<Notifications position="top-right" />
+					<Notifications />
 					{children}
 				</ModalsProvider>
 			</MantineProvider>
