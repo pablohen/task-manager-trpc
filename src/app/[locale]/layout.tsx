@@ -5,6 +5,7 @@ import "@mantine/nprogress/styles.css";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { Metadata } from "next";
 import { AppLayout } from "@/components/app-layout";
+import { plexMono, plexSans } from "@/fonts";
 import { locales } from "@/i18n/config";
 import { messages } from "@/i18n/messages";
 import { getIntl, getLocale } from "@/i18n/server";
@@ -29,7 +30,11 @@ export default async function RootLayout({
 	const locale = await getLocale();
 
 	return (
-		<html lang={locale} {...mantineHtmlProps}>
+		<html
+			lang={locale}
+			className={`${plexSans.variable} ${plexMono.variable}`}
+			{...mantineHtmlProps}
+		>
 			<head>
 				<ColorSchemeScript />
 			</head>

@@ -40,6 +40,7 @@ export function TaskCard({
 					<Text
 						component="time"
 						size="xs"
+						ff="monospace"
 						c="dimmed"
 						dateTime={task.createdAt.toISOString()}
 						suppressHydrationWarning

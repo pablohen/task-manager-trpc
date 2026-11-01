@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { useIntl } from "react-intl";
 import { useLocalizedPath } from "@/i18n/client";
+import { brandGradient } from "@/theme";
 import { LanguageMenu } from "./language-menu";
 import { RouteProgress } from "./route-progress";
 import { TaskSearch, TaskSearchFallback } from "./task-search";
@@ -31,7 +32,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 			<Suspense>
 				<RouteProgress />
 			</Suspense>
-			<AppShell.Header>
+			{/* The brand gradient as a thin line under the header. */}
+			<AppShell.Header
+				style={{
+					borderBottom: "3px solid",
+					borderImage: `${brandGradient} 1`,
+				}}
+			>
 				<Container size="sm" h="100%">
 					<Group h="100%" gap="sm" wrap="nowrap">
 						<UnstyledButton
