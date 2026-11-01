@@ -17,6 +17,7 @@
 		"@mantine/hooks": "^9.7.4",
 		"@mantine/modals": "^9.7.4",
 		"@mantine/notifications": "^9.7.4",
+		"@mantine/nprogress": "^9.7.4",
 		"@phosphor-icons/react": "^2.1.10",
 		"@tanstack/react-query": "^5.105.0",
 		"@trpc/client": "^11.22.1",

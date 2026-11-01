@@ -13,6 +13,7 @@ import {
 import { ListChecksIcon, PlusIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { RouteProgress } from "./route-progress";
 import { TaskSearch, TaskSearchFallback } from "./task-search";
 
 // AppShell's compound parts can't be used from a server component, so the
@@ -20,6 +21,9 @@ import { TaskSearch, TaskSearchFallback } from "./task-search";
 export function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<AppShell header={{ height: 64 }}>
+			<Suspense>
+				<RouteProgress />
+			</Suspense>
 			<AppShell.Header>
 				<Container size="sm" h="100%">
 					<Group h="100%" gap="sm" wrap="nowrap">

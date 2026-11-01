@@ -181,6 +181,9 @@ importers:
       '@mantine/notifications':
         specifier: ^9.7.4
         version: 9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.7.4(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@mantine/nprogress':
+        specifier: ^9.7.4
+        version: 9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.7.4(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -614,6 +617,14 @@ packages:
 
   '@mantine/notifications@9.7.4':
     resolution: {integrity: sha512-LabOPnE/YtdpXHn49ZJjiJJBYnYXUMi6SFuzxje7XxpoxImZ+wdGh4R/+l89NnWTxKwGoQL51iUTL8PSgu2A1Q==}
+    peerDependencies:
+      '@mantine/core': 9.7.4
+      '@mantine/hooks': 9.7.4
+      react: ^19.2.0
+      react-dom: ^19.2.0
+
+  '@mantine/nprogress@9.7.4':
+    resolution: {integrity: sha512-PxZ9JQz6X/GHhg+ZBNeIu8W6JSCxsODotRBm3HscwWenKm7Ca/1SAKXFNBwKxg8AIYKU8YB0eKyVYrfycD57DA==}
     peerDependencies:
       '@mantine/core': 9.7.4
       '@mantine/hooks': 9.7.4
@@ -1610,6 +1621,14 @@ snapshots:
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       react-transition-group: 4.4.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+
+  '@mantine/nprogress@9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(@mantine/hooks@9.7.4(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      '@mantine/core': 9.7.4(@mantine/hooks@9.7.4(react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@mantine/hooks': 9.7.4(react@19.3.0)
+      '@mantine/store': 9.7.4(react@19.3.0)
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
 
   '@mantine/store@9.7.4(react@19.3.0)':
     dependencies:
