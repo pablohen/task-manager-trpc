@@ -1,20 +1,37 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { isLocale, LOCALE_COOKIE, matchLocale } from "@/i18n/config";
+import {
+	defaultLocale,
+	isLocale,
+	LOCALE_COOKIE,
+	matchLocale,
+	stripLocale,
+} from "@/i18n/config";
 
-// Every page lives under /{locale}. Requests without one are redirected to
-// the language picked earlier (cookie) or the browser's preferred one.
+// Pages live under app/[locale]. English, the default, is served without a
+// prefix (rewritten to /en internally); other locales keep theirs (/pt, /es).
 export function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
-	if (isLocale(pathname.split("/")[1])) return;
+	const prefix = pathname.split("/")[1];
+	const url = request.nextUrl.clone();
 
+	// /en/... is reachable without the prefix; keep one URL per page.
+	if (prefix === defaultLocale) {
+		url.pathname = stripLocale(pathname);
+		return NextResponse.redirect(url);
+	}
+	if (isLocale(prefix)) return;
+
+	// No prefix: English, unless the visitor chose (cookie) or prefers
+	// (Accept-Language) another locale.
 	const saved = request.cookies.get(LOCALE_COOKIE)?.value;
 	const locale = isLocale(saved)
 		? saved
 		: matchLocale(request.headers.get("accept-language"));
-
-	const url = request.nextUrl.clone();
 	url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
-	return NextResponse.redirect(url);
+
+	return locale === defaultLocale
+		? NextResponse.rewrite(url)
+		: NextResponse.redirect(url);
 }
 
 export const config = {

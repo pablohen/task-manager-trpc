@@ -9,6 +9,8 @@ import {
 	type Locale,
 	localeNames,
 	locales,
+	localizePath,
+	stripLocale,
 } from "@/i18n/config";
 
 export function LanguageMenu() {
@@ -23,8 +25,9 @@ export function LanguageMenu() {
 		// document (<html lang>, messages, providers), and a client navigation
 		// would keep the old locale's tree mounted in the background.
 		const { pathname, search } = window.location;
-		const rest = pathname.slice(`/${current}`.length);
-		window.location.replace(`/${locale}${rest}${search}`);
+		window.location.replace(
+			localizePath(locale, stripLocale(pathname)) + search,
+		);
 	};
 
 	return (

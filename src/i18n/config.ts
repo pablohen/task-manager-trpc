@@ -35,7 +35,17 @@ export function matchLocale(acceptLanguage: string | null): Locale {
 	);
 }
 
-/** "/" → "/pt", "/tasks/new" → "/pt/tasks/new", "/?q=x" → "/pt?q=x". */
+/**
+ * English, the default, has no prefix: "/tasks/new" stays as is for `en` and
+ * becomes "/pt/tasks/new" for `pt` ("/" → "/pt", "/?q=x" → "/pt?q=x").
+ */
 export function localizePath(locale: Locale, path: string) {
+	if (locale === defaultLocale) return path;
 	return `/${locale}${path.startsWith("/?") || path === "/" ? path.slice(1) : path}`;
+}
+
+/** "/pt/tasks/new" → "/tasks/new"; paths without a locale are unchanged. */
+export function stripLocale(pathname: string) {
+	const [, first, ...rest] = pathname.split("/");
+	return isLocale(first) ? `/${rest.join("/")}` : pathname;
 }

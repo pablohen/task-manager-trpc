@@ -1,6 +1,6 @@
 import { createIntl } from "react-intl/server";
 import { describe, expect, it } from "vitest";
-import { locales, localizePath, matchLocale } from "./config";
+import { locales, localizePath, matchLocale, stripLocale } from "./config";
 import { type MessageId, messages } from "./messages";
 
 describe("matchLocale", () => {
@@ -19,10 +19,29 @@ describe("matchLocale", () => {
 });
 
 describe("localizePath", () => {
-	it("prefixes paths with the locale", () => {
+	it("prefixes paths with non-default locales", () => {
 		expect(localizePath("pt", "/")).toBe("/pt");
 		expect(localizePath("es", "/tasks/new")).toBe("/es/tasks/new");
-		expect(localizePath("en", "/?q=milk")).toBe("/en?q=milk");
+		expect(localizePath("pt", "/?q=milk")).toBe("/pt?q=milk");
+	});
+
+	it("leaves English paths unprefixed", () => {
+		expect(localizePath("en", "/")).toBe("/");
+		expect(localizePath("en", "/tasks/new")).toBe("/tasks/new");
+		expect(localizePath("en", "/?q=milk")).toBe("/?q=milk");
+	});
+});
+
+describe("stripLocale", () => {
+	it("removes a locale prefix", () => {
+		expect(stripLocale("/pt")).toBe("/");
+		expect(stripLocale("/es/tasks/new")).toBe("/tasks/new");
+		expect(stripLocale("/en/tasks/new")).toBe("/tasks/new");
+	});
+
+	it("keeps paths without one", () => {
+		expect(stripLocale("/")).toBe("/");
+		expect(stripLocale("/tasks/new")).toBe("/tasks/new");
 	});
 });
 

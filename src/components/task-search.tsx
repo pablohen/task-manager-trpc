@@ -6,7 +6,7 @@ import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { useIntl } from "react-intl";
-import { useLocale, useLocalizedPath } from "@/i18n/client";
+import { useLocalizedPath } from "@/i18n/client";
 
 // The term lives in the list's URL (/?q=) so results are server-rendered and
 // shareable. The box sits in the header, so searching from another page
@@ -15,7 +15,7 @@ export function TaskSearch() {
 	const intl = useIntl();
 	const router = useRouter();
 	const localize = useLocalizedPath();
-	const onList = usePathname() === `/${useLocale()}`;
+	const onList = usePathname() === localize("/");
 	const urlTerm = useSearchParams().get("q") ?? "";
 	const listTerm = onList ? urlTerm : "";
 	const [value, setValue] = useState(listTerm);
