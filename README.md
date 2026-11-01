@@ -1,6 +1,6 @@
 # Task Manager
 
-A small task manager built with Next.js and tRPC. Tasks live in server memory, the list is server-rendered and loads more as you scroll, and the same Zod schema validates input in the browser and on the server.
+A small task manager built with Next.js and tRPC. Tasks live in server memory, the list is server-rendered, searchable and loads more as you scroll, and the same Zod schema validates input in the browser and on the server.
 
 ## Stack
 
@@ -53,6 +53,8 @@ src/
 **Backend.** The router validates every input with Zod and reads from a store passed in through the tRPC context, so tests can use a fresh store. A missing task throws `NOT_FOUND` ("Task not found"). Invalid input returns `BAD_REQUEST` with a readable message and per-field errors (`data.zodError`), which the form shows next to the matching inputs.
 
 **List page.** The server component calls the router in-process (no HTTP round trip) to prefetch the first page into a per-request QueryClient. It then dehydrates that cache into the HTML. On the client, `useSuspenseInfiniteQuery` picks up the hydrated data without fetching again. A sentinel element at the bottom of the list fetches the next page when it scrolls into view.
+
+**Search.** The search box writes the term to the URL (`?q=`) after a short pause, so results are server-rendered on a full load and the link can be shared. The list endpoint filters by title and description (case-insensitive) before paginating.
 
 **Delete.** Each delete asks for confirmation. The task is removed from the cache right away; on failure the list is restored and the server's error is shown.
 
