@@ -1,12 +1,12 @@
 import { Skeleton, Stack, Title } from "@mantine/core";
-import { TRPCError } from "@trpc/server";
+import { TRPCClientError } from "@trpc/client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { TaskForm } from "@/components/task-form";
 import { getIntl } from "@/i18n/server";
-import { caller } from "@/trpc/server";
+import { client } from "@/trpc/server";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const intl = await getIntl();
@@ -39,12 +39,10 @@ async function EditTaskForm({
 	params,
 }: Pick<PageProps<"/[locale]/tasks/[id]/edit">, "params">) {
 	const { id } = await params;
-	const task = await caller.task.byId({ id }).catch((error: unknown) => {
+	const task = await client.task.byId.query({ id }).catch((error: unknown) => {
 		// A malformed id fails validation; either way there is no such task.
-		if (
-			error instanceof TRPCError &&
-			(error.code === "NOT_FOUND" || error.code === "BAD_REQUEST")
-		) {
+		const code = error instanceof TRPCClientError ? error.data?.code : null;
+		if (code === "NOT_FOUND" || code === "BAD_REQUEST") {
 			notFound();
 		}
 		throw error;
