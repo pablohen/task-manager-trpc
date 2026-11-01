@@ -35,6 +35,7 @@ Before finishing a change, run `pnpm lint`, `pnpm typecheck` and `pnpm test`. Ru
 
 - Validation rules and types shared by client and server: `src/server/tasks/schema.ts`.
 - Data access: `src/server/tasks/store.ts`, reached through `ctx.store` in the router. Don't import the store elsewhere.
+- Server components read data with `trpc` / `client` from `@/trpc/server`, which go through `/api/trpc`. Don't call the router in-process: on Vercel the page and API functions don't share memory.
 - Procedures: `src/server/routers/`. Throw `TRPCError` with `NOT_FOUND` / `BAD_REQUEST`.
 - Pages: `src/app/[locale]/`. UI: `src/components/`, `src/hooks/`.
 - User-facing text: `src/i18n/messages/{en,pt,es}.ts`. Every key in all three.

@@ -6,12 +6,14 @@
 Browser                          Server (Next.js)
 ─────────────────────────────    ───────────────────────────────────────
 Client components                Server components (pages, layouts)
-  useTRPC() + TanStack Query       trpc proxy (in-process, no HTTP)
+  useTRPC() + TanStack Query       trpc proxy / client (src/trpc/server.tsx)
         │                                 │
-        │ HTTP  /api/trpc                 │
+        │ HTTP  /api/trpc                 │ HTTP  /api/trpc (same origin)
         ▼                                 ▼
-  route.ts (fetch adapter) ─────► appRouter ─► ctx.store ─► in-memory data
+  route.ts (fetch adapter) ─► appRouter ─► ctx.store ─► in-memory data
 ```
+
+Both sides reach the data through the API route. Server components could call the router in-process, but the tasks live in memory, and on Vercel each route is a separate function with its own memory: a page rendering from its own copy would never see tasks created through the API. Going through `/api/trpc` makes the API route the only owner of the data. The server client calls the incoming request's origin and forwards its cookies, so protected preview deployments let the call through.
 
 | Path | Role |
 | --- | --- |
@@ -20,7 +22,7 @@ Client components                Server components (pages, layouts)
 | `src/server/trpc.ts` | tRPC init (superjson, error formatter) and the request context. |
 | `src/server/routers/` | `task` router and the root `appRouter`. |
 | `src/app/api/trpc/[trpc]/route.ts` | Exposes the router over HTTP. |
-| `src/trpc/server.tsx` | Server-side options proxy, per-request `QueryClient`, `HydrateClient`. |
+| `src/trpc/server.tsx` | Server-side tRPC client and options proxy (over HTTP to the API route), per-request `QueryClient`, `HydrateClient`. |
 | `src/trpc/client.tsx` | Browser tRPC client and `TRPCReactProvider`. |
 | `src/trpc/query-client.ts` | Shared `QueryClient` defaults (stale time, superjson (de)hydration). |
 | `src/i18n/` | Locales, message catalogs, server/client helpers. See [i18n.md](i18n.md). |
@@ -53,7 +55,7 @@ Cache Components is on (`next.config.ts`), so pages are prerendered by default a
 
 The server prefetch and the client query must build the same query key. Both use `TASKS_PAGE_SIZE`, `getNextTaskCursor` and `toSearchTerm` from `schema.ts`.
 
-**Edit page.** The task is loaded in-process with `caller.task.byId` inside `<Suspense>`. `NOT_FOUND` or a malformed id calls `notFound()`.
+**Edit page.** The task is loaded with `client.task.byId.query` inside `<Suspense>`. `NOT_FOUND` or a malformed id calls `notFound()`.
 
 **Preserved routes.** With Cache Components, Next keeps up to 3 visited routes mounted but hidden (React `<Activity>`). `TaskForm` remounts itself after a successful save (a `key` bumped in a `useLayoutEffect` cleanup) so that returning to the form shows an empty form and an idle button. Unsaved drafts are kept.
 

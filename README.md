@@ -67,7 +67,8 @@ src/
 - **In-memory store.** The challenge asks for no database. Only the data is pinned to `globalThis`, so dev hot reloads keep the tasks and still pick up code changes.
 - **Cursor pagination using an insertion sequence.** The cursor is each task's sequence number, not an offset or a timestamp, so deleting tasks while scrolling doesn't skip or repeat items.
 - **One Zod schema for client and server.** Validation rules can't drift apart. Its messages are i18n message ids, so errors show in the user's language.
-- **Prefetch on the server, hydrate on the client.** Server components call the router in-process and stream the first page into the HTML; the client picks it up without a second request.
+- **Prefetch on the server, hydrate on the client.** Server components fetch the first page and stream it into the HTML; the client picks it up without a second request.
+- **The API route owns the data.** Server components read through `/api/trpc` too, because on Vercel each route runs as a separate function with its own memory.
 - **Locale in the URL.** Each language gets its own server-rendered pages and shareable links, which fits Cache Components better than a cookie. English, the default, has no prefix.
 - **superjson.** Lets `createdAt` arrive in the browser as a `Date` instead of a string.
 
