@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { useIntl } from "react-intl";
 import { useLocalizedPath } from "@/i18n/client";
+import { LanguageMenu } from "./language-menu";
 import { RouteProgress } from "./route-progress";
 import { TaskSearch, TaskSearchFallback } from "./task-search";
 
@@ -51,6 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 								<TaskSearch />
 							</Suspense>
 						</Box>
+						<LanguageMenu />
 						{/* Icon-only on phones to leave room for the search box. */}
 						<ActionIcon
 							component={Link}
