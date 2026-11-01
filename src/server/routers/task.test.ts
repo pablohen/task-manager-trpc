@@ -79,6 +79,12 @@ describe("task router", () => {
 		expect((await caller.task.list({})).items).toEqual([]);
 	});
 
+	it("rejects a malformed cursor", async () => {
+		await expect(setup().task.list({ cursor: "abc" })).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+		});
+	});
+
 	it("paginates the list", async () => {
 		const caller = setup();
 		for (let i = 0; i < 3; i++) await caller.task.create({ title: `T${i}` });

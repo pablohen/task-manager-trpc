@@ -13,7 +13,7 @@ export const taskRouter = router({
 		.input(
 			z.object({
 				limit: z.number().int().min(1).max(50).default(10),
-				cursor: z.string().nullish(),
+				cursor: z.string().regex(/^\d+$/, "Invalid cursor").nullish(),
 			}),
 		)
 		.query(({ ctx, input }) => ctx.store.list(input)),
