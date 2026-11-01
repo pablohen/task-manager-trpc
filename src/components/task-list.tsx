@@ -50,7 +50,8 @@ export function TaskList() {
 
 	const tasks = data.pages.flatMap((page) => page.items);
 
-	if (tasks.length === 0) {
+	// During an optimistic delete a loaded page can be empty while more remain.
+	if (tasks.length === 0 && !hasNextPage) {
 		return (
 			<Stack align="center" py="xl">
 				<Text c="dimmed">No tasks yet.</Text>
