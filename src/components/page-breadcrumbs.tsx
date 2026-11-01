@@ -2,11 +2,13 @@
 
 import { Anchor, Breadcrumbs, Text } from "@mantine/core";
 import Link from "next/link";
+import { useLocalizedPath } from "@/i18n/client";
 
 type Crumb = { label: string; href?: string };
 
 /** The last crumb is the current page and isn't a link. */
 export function PageBreadcrumbs({ items }: { items: Crumb[] }) {
+	const localize = useLocalizedPath();
 	return (
 		<nav aria-label="Breadcrumb">
 			<Breadcrumbs>
@@ -15,7 +17,7 @@ export function PageBreadcrumbs({ items }: { items: Crumb[] }) {
 						<Anchor
 							key={item.label}
 							component={Link}
-							href={item.href}
+							href={localize(item.href)}
 							size="sm"
 						>
 							{item.label}

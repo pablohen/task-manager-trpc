@@ -5,13 +5,17 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { useIntl } from "react-intl";
+import { useLocale, useLocalizedPath } from "@/i18n/client";
 
 // The term lives in the list's URL (/?q=) so results are server-rendered and
 // shareable. The box sits in the header, so searching from another page
 // navigates to the list.
 export function TaskSearch() {
+	const intl = useIntl();
 	const router = useRouter();
-	const onList = usePathname() === "/";
+	const localize = useLocalizedPath();
+	const onList = usePathname() === `/${useLocale()}`;
 	const urlTerm = useSearchParams().get("q") ?? "";
 	const listTerm = onList ? urlTerm : "";
 	const [value, setValue] = useState(listTerm);
@@ -26,7 +30,7 @@ export function TaskSearch() {
 	const updateUrl = useDebouncedCallback((term: string) => {
 		const q = term.trim();
 		if (!onList && !q) return;
-		const href = q ? `/?q=${encodeURIComponent(q)}` : "/";
+		const href = localize(q ? `/?q=${encodeURIComponent(q)}` : "/");
 		startTransition(() => {
 			if (onList) router.replace(href, { scroll: false });
 			else router.push(href);
@@ -41,8 +45,8 @@ export function TaskSearch() {
 	return (
 		<TextInput
 			type="search"
-			aria-label="Search tasks"
-			placeholder="Search tasks"
+			aria-label={intl.formatMessage({ id: "search.label" })}
+			placeholder={intl.formatMessage({ id: "search.label" })}
 			leftSection={<MagnifyingGlassIcon />}
 			rightSection={
 				isPending ? (
@@ -50,7 +54,7 @@ export function TaskSearch() {
 				) : (
 					value && (
 						<CloseButton
-							aria-label="Clear search"
+							aria-label={intl.formatMessage({ id: "search.clear" })}
 							onClick={() => {
 								search("");
 								updateUrl.flush();
@@ -66,10 +70,11 @@ export function TaskSearch() {
 }
 
 export function TaskSearchFallback() {
+	const label = useIntl().formatMessage({ id: "search.label" });
 	return (
 		<TextInput
-			aria-label="Search tasks"
-			placeholder="Search tasks"
+			aria-label={label}
+			placeholder={label}
 			leftSection={<MagnifyingGlassIcon />}
 			disabled
 		/>

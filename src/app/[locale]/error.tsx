@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, Button, Stack } from "@mantine/core";
+import { useIntl } from "react-intl";
 
 export default function ErrorPage({
 	error,
@@ -9,16 +10,17 @@ export default function ErrorPage({
 	error: unknown;
 	retry: () => void;
 }) {
-	const message =
-		error instanceof Error ? error.message : "Something went wrong.";
+	const intl = useIntl();
 
 	return (
 		<Stack align="flex-start">
-			<Alert color="red" title="Something went wrong">
-				{message}
+			<Alert color="red" title={intl.formatMessage({ id: "error.title" })}>
+				{error instanceof Error
+					? error.message
+					: intl.formatMessage({ id: "error.generic" })}
 			</Alert>
 			<Button variant="light" onClick={() => retry()}>
-				Try again
+				{intl.formatMessage({ id: "error.retry" })}
 			</Button>
 		</Stack>
 	);

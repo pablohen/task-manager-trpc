@@ -8,6 +8,8 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useIntl } from "react-intl";
+import { useLocalizedPath } from "@/i18n/client";
 import type { AppRouter } from "@/server/routers/_app";
 import { type Task, taskInputSchema } from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
@@ -47,6 +49,8 @@ function TaskFormFields({
 	task,
 	onSaved,
 }: TaskFormProps & { onSaved: () => void }) {
+	const intl = useIntl();
+	const localize = useLocalizedPath();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const router = useRouter();
@@ -74,9 +78,11 @@ function TaskFormFields({
 		});
 		notifications.show({
 			color: "green",
-			message: task ? "Task updated" : "Task created",
+			message: intl.formatMessage({
+				id: task ? "form.updated" : "form.created",
+			}),
 		});
-		router.push("/");
+		router.push(localize("/"));
 	};
 
 	const onError = (error: TRPCClientErrorLike<AppRouter>) => {
@@ -93,7 +99,9 @@ function TaskFormFields({
 		if (!shownInline) {
 			notifications.show({
 				color: "red",
-				title: task ? "Could not update the task" : "Could not create the task",
+				title: intl.formatMessage({
+					id: task ? "form.updateError" : "form.createError",
+				}),
 				message: error.message,
 			});
 		}
@@ -118,16 +126,18 @@ function TaskFormFields({
 		<form onSubmit={onSubmit} noValidate>
 			<Stack>
 				<TextInput
-					label="Title"
-					placeholder="What needs to be done?"
+					label={intl.formatMessage({ id: "form.title" })}
+					placeholder={intl.formatMessage({ id: "form.titlePlaceholder" })}
 					withAsterisk
 					autoFocus
 					error={errors.title?.message}
 					{...register("title")}
 				/>
 				<Textarea
-					label="Description"
-					placeholder="Optional details"
+					label={intl.formatMessage({ id: "form.description" })}
+					placeholder={intl.formatMessage({
+						id: "form.descriptionPlaceholder",
+					})}
 					autosize
 					minRows={3}
 					error={errors.description?.message}
@@ -145,10 +155,10 @@ function TaskFormFields({
 						disabled={busy}
 						w={{ base: "100%", xs: "auto" }}
 					>
-						Cancel
+						{intl.formatMessage({ id: "form.cancel" })}
 					</LinkButton>
 					<Button type="submit" loading={busy} w={{ base: "100%", xs: "auto" }}>
-						{task ? "Save changes" : "Create task"}
+						{intl.formatMessage({ id: task ? "form.save" : "form.create" })}
 					</Button>
 				</Flex>
 			</Stack>

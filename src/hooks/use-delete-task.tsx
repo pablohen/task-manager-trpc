@@ -9,11 +9,13 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { useRef } from "react";
+import { useIntl } from "react-intl";
 import type { Task, TaskPage } from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
 
 /** Returns a function that asks for confirmation, then deletes optimistically. */
 export function useDeleteTask() {
+	const intl = useIntl();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const listKey = trpc.task.list.infiniteQueryKey();
@@ -46,12 +48,15 @@ export function useDeleteTask() {
 				}
 				notifications.show({
 					color: "red",
-					title: "Could not delete the task",
+					title: intl.formatMessage({ id: "delete.error" }),
 					message: error.message,
 				});
 			},
 			onSuccess: () => {
-				notifications.show({ color: "green", message: "Task deleted" });
+				notifications.show({
+					color: "green",
+					message: intl.formatMessage({ id: "delete.success" }),
+				});
 			},
 			onSettled: (_data, _error, { id }) => {
 				deleting.current.delete(id);
@@ -64,11 +69,16 @@ export function useDeleteTask() {
 		modals.openConfirmModal({
 			// A fixed id makes Mantine ignore a second open for the same task.
 			modalId: `delete-${task.id}`,
-			title: "Delete task",
+			title: intl.formatMessage({ id: "delete.title" }),
 			children: (
-				<Text size="sm">“{task.title}” will be permanently removed.</Text>
+				<Text size="sm">
+					{intl.formatMessage({ id: "delete.body" }, { title: task.title })}
+				</Text>
 			),
-			labels: { confirm: "Delete", cancel: "Cancel" },
+			labels: {
+				confirm: intl.formatMessage({ id: "delete.confirm" }),
+				cancel: intl.formatMessage({ id: "delete.cancel" }),
+			},
 			confirmProps: { color: "red" },
 			onConfirm: () => {
 				if (deleting.current.has(task.id)) return;

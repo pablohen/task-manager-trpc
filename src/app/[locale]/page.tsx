@@ -2,6 +2,7 @@ import { Stack, Title } from "@mantine/core";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { TaskList, TaskListSkeleton } from "@/components/task-list";
+import { getIntl } from "@/i18n/server";
 import {
 	getNextTaskCursor,
 	TASKS_PAGE_SIZE,
@@ -9,10 +10,14 @@ import {
 } from "@/server/tasks/schema";
 import { getQueryClient, HydrateClient, trpc } from "@/trpc/server";
 
-export default function HomePage({ searchParams }: PageProps<"/[locale]">) {
+export default async function HomePage({
+	searchParams,
+}: PageProps<"/[locale]">) {
+	const intl = await getIntl();
+
 	return (
 		<Stack>
-			<Title order={1}>Tasks</Title>
+			<Title order={1}>{intl.formatMessage({ id: "list.title" })}</Title>
 			<Suspense fallback={<TaskListSkeleton />}>
 				<PrefetchedTaskList searchParams={searchParams} />
 			</Suspense>

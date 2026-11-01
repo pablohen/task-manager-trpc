@@ -5,6 +5,7 @@ import { useIntersection } from "@mantine/hooks";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { FormattedMessage } from "react-intl";
 import { useDeleteTask } from "@/hooks/use-delete-task";
 import {
 	getNextTaskCursor,
@@ -61,15 +62,17 @@ export function TaskList() {
 		if (search) {
 			return (
 				<Text c="dimmed" ta="center" py="xl">
-					No tasks match “{search}”.
+					<FormattedMessage id="list.noMatches" values={{ search }} />
 				</Text>
 			);
 		}
 		return (
 			<Stack align="center" py="xl">
-				<Text c="dimmed">No tasks yet.</Text>
+				<Text c="dimmed">
+					<FormattedMessage id="list.empty" />
+				</Text>
 				<LinkButton href="/tasks/new" variant="light">
-					Create your first task
+					<FormattedMessage id="list.createFirst" />
 				</LinkButton>
 			</Stack>
 		);
@@ -85,16 +88,16 @@ export function TaskList() {
 				{isFetchNextPageError && !isFetchingNextPage && (
 					<Stack align="center" gap="xs">
 						<Text size="sm" c="red">
-							Could not load more tasks.
+							<FormattedMessage id="list.loadMoreError" />
 						</Text>
 						<Button size="xs" variant="light" onClick={() => fetchNextPage()}>
-							Try again
+							<FormattedMessage id="list.retry" />
 						</Button>
 					</Stack>
 				)}
 				{!hasNextPage && (
 					<Text size="sm" c="dimmed">
-						You've reached the end.
+						<FormattedMessage id="list.end" />
 					</Text>
 				)}
 			</Center>

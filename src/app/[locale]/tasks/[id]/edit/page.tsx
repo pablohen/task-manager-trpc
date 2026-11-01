@@ -5,19 +5,29 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { TaskForm } from "@/components/task-form";
+import { getIntl } from "@/i18n/server";
 import { caller } from "@/trpc/server";
 
-export const metadata: Metadata = { title: "Edit task" };
+export async function generateMetadata(): Promise<Metadata> {
+	const intl = await getIntl();
+	return { title: intl.formatMessage({ id: "form.editTitle" }) };
+}
 
-export default function EditTaskPage({
+export default async function EditTaskPage({
 	params,
 }: PageProps<"/[locale]/tasks/[id]/edit">) {
+	const intl = await getIntl();
+	const title = intl.formatMessage({ id: "form.editTitle" });
+
 	return (
 		<Stack>
 			<PageBreadcrumbs
-				items={[{ label: "Tasks", href: "/" }, { label: "Edit task" }]}
+				items={[
+					{ label: intl.formatMessage({ id: "list.title" }), href: "/" },
+					{ label: title },
+				]}
 			/>
-			<Title order={1}>Edit task</Title>
+			<Title order={1}>{title}</Title>
 			<Suspense fallback={<Skeleton height={220} radius="md" />}>
 				<EditTaskForm params={params} />
 			</Suspense>
