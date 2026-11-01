@@ -5,7 +5,7 @@ export default function NotFound() {
 	return (
 		<Stack align="flex-start">
 			<Title order={1}>Not found</Title>
-			<Text c="dimmed">This task doesn't exist or was deleted.</Text>
+			<Text c="dimmed">The page or task you're looking for doesn't exist.</Text>
 			<LinkButton href="/" variant="light">
 				Back to tasks
 			</LinkButton>
