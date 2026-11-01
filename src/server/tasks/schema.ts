@@ -29,3 +29,7 @@ export type TaskPage = { items: Task[]; nextCursor: string | null };
 // Shared by the server prefetch and the client query.
 export const TASKS_PAGE_SIZE = 10;
 export const getNextTaskCursor = (page: TaskPage) => page.nextCursor;
+
+/** Turns the `?q=` search param into the list's `search` input. */
+export const toSearchTerm = (q: string | string[] | null | undefined) =>
+	(typeof q === "string" && q.trim()) || undefined;

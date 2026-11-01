@@ -3,15 +3,21 @@
 import { Button, Center, Loader, Skeleton, Stack, Text } from "@mantine/core";
 import { useIntersection } from "@mantine/hooks";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useDeleteTask } from "@/hooks/use-delete-task";
-import { getNextTaskCursor, TASKS_PAGE_SIZE } from "@/server/tasks/schema";
+import {
+	getNextTaskCursor,
+	TASKS_PAGE_SIZE,
+	toSearchTerm,
+} from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
 import { LinkButton } from "./link-button";
 import { TaskCard } from "./task-card";
 
 export function TaskList() {
 	const trpc = useTRPC();
+	const search = toSearchTerm(useSearchParams().get("q"));
 	const {
 		data,
 		fetchNextPage,
@@ -20,7 +26,7 @@ export function TaskList() {
 		isFetchNextPageError,
 	} = useSuspenseInfiniteQuery(
 		trpc.task.list.infiniteQueryOptions(
-			{ limit: TASKS_PAGE_SIZE },
+			{ limit: TASKS_PAGE_SIZE, search },
 			{ getNextPageParam: getNextTaskCursor },
 		),
 	);
@@ -52,6 +58,13 @@ export function TaskList() {
 
 	// During an optimistic delete a loaded page can be empty while more remain.
 	if (tasks.length === 0 && !hasNextPage) {
+		if (search) {
+			return (
+				<Text c="dimmed" ta="center" py="xl">
+					No tasks match “{search}”.
+				</Text>
+			);
+		}
 		return (
 			<Stack align="center" py="xl">
 				<Text c="dimmed">No tasks yet.</Text>
