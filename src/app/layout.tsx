@@ -1,8 +1,9 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
-import { ColorSchemeScript, Container, mantineHtmlProps } from "@mantine/core";
+import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { Metadata } from "next";
+import { AppLayout } from "@/components/app-layout";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -18,9 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 			</head>
 			<body>
 				<Providers>
-					<Container size="sm" py={{ base: "md", sm: "xl" }}>
-						{children}
-					</Container>
+					<AppLayout>{children}</AppLayout>
 				</Providers>
 			</body>
 		</html>
