@@ -7,5 +7,11 @@ export default defineConfig({
 	},
 	test: {
 		environment: "node",
+		coverage: {
+			provider: "v8",
+			// The unit tests cover the backend; the UI is checked in the browser.
+			include: ["src/server/**/*.ts"],
+			reporter: ["text", "html"],
+		},
 	},
 });

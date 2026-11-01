@@ -24,6 +24,7 @@ Other scripts:
 
 ```bash
 pnpm test       # unit tests (store + tRPC router)
+pnpm coverage   # unit tests with a coverage report (terminal + coverage/index.html)
 pnpm lint       # Biome
 pnpm typecheck  # route types + tsc
 pnpm build      # production build
