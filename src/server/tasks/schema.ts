@@ -1,15 +1,19 @@
 import { z } from "zod";
+import type { MessageId } from "@/i18n/messages";
+
+// Validation messages are message ids, translated wherever they are shown.
+const message = (id: MessageId) => id;
 
 export const taskInputSchema = z.object({
 	title: z
 		.string()
 		.trim()
-		.min(1, "Title is required")
-		.max(120, "Title must be at most 120 characters"),
+		.min(1, message("validation.titleRequired"))
+		.max(120, message("validation.titleTooLong")),
 	description: z
 		.string()
 		.trim()
-		.max(1000, "Description must be at most 1000 characters")
+		.max(1000, message("validation.descriptionTooLong"))
 		// An empty textarea submits "", which should mean "no description".
 		.transform((value) => value || undefined)
 		.optional(),

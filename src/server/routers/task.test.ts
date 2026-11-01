@@ -13,7 +13,7 @@ describe("task router", () => {
 		});
 	});
 
-	it("formats validation errors as readable text with field errors", async () => {
+	it("returns validation errors as message ids with field errors", async () => {
 		const response = await fetchRequestHandler({
 			endpoint: "/api/trpc",
 			req: new Request("http://test/api/trpc/task.create", {
@@ -27,9 +27,9 @@ describe("task router", () => {
 		const { error } = await response.json();
 
 		expect(response.status).toBe(400);
-		expect(error.json.message).toBe("Title is required");
+		expect(error.json.message).toBe("validation.titleRequired");
 		expect(error.json.data.zodError.fieldErrors).toEqual({
-			title: ["Title is required"],
+			title: ["validation.titleRequired"],
 		});
 	});
 

@@ -10,12 +10,14 @@ import {
 } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useIntl } from "react-intl";
+import { useErrorMessage } from "@/i18n/client";
 import type { Task, TaskPage } from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
 
 /** Returns a function that asks for confirmation, then deletes optimistically. */
 export function useDeleteTask() {
 	const intl = useIntl();
+	const errorMessage = useErrorMessage();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const listKey = trpc.task.list.infiniteQueryKey();
@@ -49,7 +51,7 @@ export function useDeleteTask() {
 				notifications.show({
 					color: "red",
 					title: intl.formatMessage({ id: "delete.error" }),
-					message: error.message,
+					message: errorMessage(error),
 				});
 			},
 			onSuccess: () => {

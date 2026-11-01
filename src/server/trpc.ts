@@ -15,11 +15,11 @@ const t = initTRPC.context<Context>().create({
 		if (!(error.cause instanceof ZodError)) {
 			return { ...shape, data: { ...shape.data, zodError: null } };
 		}
-		// By default the message is the raw issue list as JSON; replace it with
-		// readable text and expose per-field errors for forms.
+		// By default the message is the raw issue list as JSON; use the first
+		// issue's message id instead and expose per-field errors for forms.
 		return {
 			...shape,
-			message: error.cause.issues.map((issue) => issue.message).join(". "),
+			message: error.cause.issues[0]?.message ?? shape.message,
 			data: { ...shape.data, zodError: z.flattenError(error.cause) },
 		};
 	},

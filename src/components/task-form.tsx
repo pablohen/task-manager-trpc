@@ -9,7 +9,11 @@ import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useIntl } from "react-intl";
-import { useLocalizedPath } from "@/i18n/client";
+import {
+	useErrorMessage,
+	useLocalizedPath,
+	useTranslateMessage,
+} from "@/i18n/client";
 import type { AppRouter } from "@/server/routers/_app";
 import { type Task, taskInputSchema } from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
@@ -51,6 +55,8 @@ function TaskFormFields({
 }: TaskFormProps & { onSaved: () => void }) {
 	const intl = useIntl();
 	const localize = useLocalizedPath();
+	const translate = useTranslateMessage();
+	const errorMessage = useErrorMessage();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const router = useRouter();
@@ -102,7 +108,7 @@ function TaskFormFields({
 				title: intl.formatMessage({
 					id: task ? "form.updateError" : "form.createError",
 				}),
-				message: error.message,
+				message: errorMessage(error),
 			});
 		}
 	};
@@ -130,7 +136,7 @@ function TaskFormFields({
 					placeholder={intl.formatMessage({ id: "form.titlePlaceholder" })}
 					withAsterisk
 					autoFocus
-					error={errors.title?.message}
+					error={translate(errors.title?.message)}
 					{...register("title")}
 				/>
 				<Textarea
@@ -140,7 +146,7 @@ function TaskFormFields({
 					})}
 					autosize
 					minRows={3}
-					error={errors.description?.message}
+					error={translate(errors.description?.message)}
 					{...register("description")}
 				/>
 				{/* Full-width and stacked on phones, primary action on top. */}
