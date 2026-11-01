@@ -1,6 +1,16 @@
 # Task Manager
 
-A small task manager built with Next.js and tRPC. Tasks live in server memory, the list is server-rendered, searchable and loads more as you scroll, and the same Zod schema validates input in the browser and on the server.
+A small task manager built with Next.js and tRPC. Tasks live in server memory, the list is server-rendered, and the same Zod schema validates input in the browser and on the server.
+
+## Features
+
+- Create, list, edit and delete tasks over tRPC, with validation and meaningful errors
+- Server-rendered list with infinite scroll
+- Search by title or description, kept in the URL so results can be shared
+- Delete with confirmation, optimistic update and success/error notifications
+- Shared create/edit form with client-side validation and loading states
+- English, Portuguese and Spanish, with a language switcher
+- Mobile-first layout with a fixed header and a navigation progress bar
 
 ## Stack
 
@@ -9,7 +19,7 @@ A small task manager built with Next.js and tRPC. Tasks live in server memory, t
 - **Zod 4** for validation
 - **Mantine 9** for UI, with Phosphor icons
 - **react-hook-form** for the form
-- **react-intl** for localization (English, Portuguese, Spanish)
+- **react-intl** for localization
 - **Vitest** for tests, **Biome** for lint and format, **pnpm**
 
 ## Running it
@@ -24,7 +34,7 @@ pnpm dev        # http://localhost:3000 (redirects to /en, /pt or /es)
 Other scripts:
 
 ```bash
-pnpm test       # unit tests (store + tRPC router)
+pnpm test       # unit tests (store, tRPC router, i18n)
 pnpm coverage   # unit tests with a coverage report (terminal + coverage/index.html)
 pnpm lint       # Biome
 pnpm typecheck  # route types + tsc
@@ -33,46 +43,33 @@ pnpm build      # production build
 
 The list starts with 25 fictional tasks. Everything resets when the server restarts.
 
-## How it works
+## Documentation
+
+- [Architecture](docs/architecture.md): layers, data, rendering, mutations, UI shell
+- [API](docs/api.md): tRPC procedures, inputs, errors, examples
+- [Localization](docs/i18n.md): how the locale is chosen, adding strings and languages
+- [Development](docs/development.md): scripts, tests, conventions, Next.js 16 rules
+
+## Project structure
 
 ```
 src/
-  server/
-    tasks/schema.ts   Zod schema, types, page size (shared with the client)
-    tasks/store.ts    in-memory store
-    trpc.ts           tRPC init, context, error formatting
-    routers/          task router (list, byId, create, update, delete)
-  trpc/
-    client.tsx        browser tRPC client + QueryClient provider
-    server.tsx        server-side tRPC proxy for prefetching
-  i18n/               locales, message catalogs, server/client helpers
-  proxy.ts            redirects to a locale
-  app/
-    [locale]/page.tsx                 task list (SSR + infinite scroll)
-    [locale]/tasks/new/page.tsx       create form
-    [locale]/tasks/[id]/edit/page.tsx edit form
-    api/trpc/[trpc]/route.ts          HTTP endpoint
+  server/      tRPC router, in-memory store, shared Zod schema
+  trpc/        tRPC client (browser) and prefetch helpers (server)
+  i18n/        locales, message catalogs, helpers
+  app/         pages under [locale]/, HTTP endpoint under api/trpc
+  components/  UI
+  proxy.ts     redirects to a locale
 ```
-
-**Backend.** The router validates every input with Zod and reads from a store passed in through the tRPC context, so tests can use a fresh store. A missing task throws `NOT_FOUND` ("Task not found"). Invalid input returns `BAD_REQUEST` with a readable message and per-field errors (`data.zodError`), which the form shows next to the matching inputs.
-
-**List page.** The server component calls the router in-process (no HTTP round trip) to prefetch the first page into a per-request QueryClient. It then dehydrates that cache into the HTML. On the client, `useSuspenseInfiniteQuery` picks up the hydrated data without fetching again. A sentinel element at the bottom of the list fetches the next page when it scrolls into view.
-
-**Search.** The search box writes the term to the URL (`?q=`) after a short pause, so results are server-rendered on a full load and the link can be shared. The list endpoint filters by title and description (case-insensitive) before paginating.
-
-**Delete.** Each delete asks for confirmation. The task is removed from the cache right away; on failure the list is restored and the server's error is shown.
-
-**Form.** A single `TaskForm` handles both create and edit. react-hook-form validates with the shared schema through `zodResolver`, so an empty or whitespace-only title is caught before any request is sent. Server errors are shown either inline on the matching field or as a notification. The submit button stays disabled while saving.
-
-**Localization.** Every page lives under a locale segment (`/en`, `/pt`, `/es`). `src/proxy.ts` redirects locale-less URLs using the language chosen in the header (a cookie) or the browser's `Accept-Language`. Server components translate with `getIntl()` (react-intl's `createIntl`, locale from `next/root-params`); client components use `IntlProvider`. Message ids are type-checked, and a test checks that every catalog has the same keys and that each message formats. Validation messages in the shared schema are message ids, so the API returns ids and the client shows them in the user's language.
 
 ## Decisions
 
-- **In-memory store on `globalThis`.** The challenge asks for no database. Pinning the store to `globalThis` keeps data from being wiped on every dev hot reload.
-- **Cursor pagination using an insertion sequence.** Each task gets an increasing sequence number, and the cursor is that number rather than an offset or a timestamp. Deleting tasks while scrolling doesn't skip or repeat items. Two tasks created in the same millisecond still sort correctly.
-- **One Zod schema for client and server.** Validation rules can't drift apart. The schema trims the title and treats an empty description as no description.
+- **In-memory store.** The challenge asks for no database. Only the data is pinned to `globalThis`, so dev hot reloads keep the tasks and still pick up code changes.
+- **Cursor pagination using an insertion sequence.** The cursor is each task's sequence number, not an offset or a timestamp, so deleting tasks while scrolling doesn't skip or repeat items.
+- **One Zod schema for client and server.** Validation rules can't drift apart. Its messages are i18n message ids, so errors show in the user's language.
+- **Prefetch on the server, hydrate on the client.** Server components call the router in-process and stream the first page into the HTML; the client picks it up without a second request.
+- **Locale in the URL.** Each language gets its own server-rendered pages and shareable links, which fits Cache Components better than a cookie.
 - **superjson.** Lets `createdAt` arrive in the browser as a `Date` instead of a string.
-- **`connection()` + `<Suspense>` on the list.** With Cache Components, pages are prerendered by default. The task list changes at runtime, so it renders per request and streams in behind a skeleton.
 
 ## Field names
 
