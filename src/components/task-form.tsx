@@ -6,15 +6,47 @@ import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import { useRouter } from "next/navigation";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { AppRouter } from "@/server/routers/_app";
 import { type Task, taskInputSchema } from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
 import { LinkButton } from "./link-button";
 
+type TaskFormProps = { task?: Task };
+
 /** Creates a task, or edits `task` when one is given. */
-export function TaskForm({ task }: { task?: Task }) {
+export function TaskForm(props: TaskFormProps) {
+	// Next keeps visited pages mounted but hidden (React Activity), so a saved
+	// form would come back with the old input and a finished mutation, and an
+	// interrupted Mantine loader transition would leave the spinner showing.
+	// Remount it when it's hidden after a save; unsent drafts are kept.
+	const [instance, setInstance] = useState(0);
+	const saved = useRef(false);
+	useLayoutEffect(
+		() => () => {
+			if (!saved.current) return;
+			saved.current = false;
+			setInstance((n) => n + 1);
+		},
+		[],
+	);
+
+	return (
+		<TaskFormFields
+			key={instance}
+			{...props}
+			onSaved={() => {
+				saved.current = true;
+			}}
+		/>
+	);
+}
+
+function TaskFormFields({
+	task,
+	onSaved,
+}: TaskFormProps & { onSaved: () => void }) {
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const router = useRouter();
@@ -23,7 +55,6 @@ export function TaskForm({ task }: { task?: Task }) {
 		register,
 		handleSubmit,
 		setError,
-		reset,
 		formState: { errors },
 	} = useForm({
 		// Same schema as the server, so most mistakes never leave the browser.
@@ -35,10 +66,9 @@ export function TaskForm({ task }: { task?: Task }) {
 			description: task?.description ?? "",
 		},
 	});
-	const saved = useRef(false);
 
 	const onSuccess = async () => {
-		saved.current = true;
+		onSaved();
 		await queryClient.invalidateQueries({
 			queryKey: trpc.task.list.infiniteQueryKey(),
 		});
@@ -78,22 +108,6 @@ export function TaskForm({ task }: { task?: Task }) {
 	const mutation = task ? update : create;
 	// Stay disabled after success too, until the redirect happens.
 	const busy = mutation.isPending || mutation.isSuccess;
-
-	// Next keeps visited pages mounted but hidden (React Activity), so after a
-	// save the form would come back with the old input and a finished mutation.
-	// Clear it when it's hidden, but only after a save, so unsent drafts survive.
-	const resetCreate = create.reset;
-	const resetUpdate = update.reset;
-	useLayoutEffect(
-		() => () => {
-			if (!saved.current) return;
-			saved.current = false;
-			reset();
-			resetCreate();
-			resetUpdate();
-		},
-		[reset, resetCreate, resetUpdate],
-	);
 
 	const onSubmit = handleSubmit((values) => {
 		if (task) update.mutate({ id: task.id, ...values });
