@@ -18,7 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 			</head>
 			<body>
 				<Providers>
-					<Container size="sm" py="xl">
+					<Container size="sm" py={{ base: "md", sm: "xl" }}>
 						{children}
 					</Container>
 				</Providers>

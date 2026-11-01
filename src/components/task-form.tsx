@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Group, Stack, Textarea, TextInput } from "@mantine/core";
+import { Button, Flex, Stack, Textarea, TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { TRPCClientErrorLike } from "@trpc/client";
@@ -133,14 +133,24 @@ function TaskFormFields({
 					error={errors.description?.message}
 					{...register("description")}
 				/>
-				<Group justify="flex-end">
-					<LinkButton href="/" variant="default" disabled={busy}>
+				{/* Full-width and stacked on phones, primary action on top. */}
+				<Flex
+					direction={{ base: "column-reverse", xs: "row" }}
+					justify="flex-end"
+					gap="sm"
+				>
+					<LinkButton
+						href="/"
+						variant="default"
+						disabled={busy}
+						w={{ base: "100%", xs: "auto" }}
+					>
 						Cancel
 					</LinkButton>
-					<Button type="submit" loading={busy}>
+					<Button type="submit" loading={busy} w={{ base: "100%", xs: "auto" }}>
 						{task ? "Save changes" : "Create task"}
 					</Button>
-				</Group>
+				</Flex>
 			</Stack>
 		</form>
 	);
