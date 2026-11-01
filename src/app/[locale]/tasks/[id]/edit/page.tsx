@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Edit task" };
 
 export default function EditTaskPage({
 	params,
-}: PageProps<"/tasks/[id]/edit">) {
+}: PageProps<"/[locale]/tasks/[id]/edit">) {
 	return (
 		<Stack>
 			<PageBreadcrumbs
@@ -27,7 +27,7 @@ export default function EditTaskPage({
 
 async function EditTaskForm({
 	params,
-}: Pick<PageProps<"/tasks/[id]/edit">, "params">) {
+}: Pick<PageProps<"/[locale]/tasks/[id]/edit">, "params">) {
 	const { id } = await params;
 	const task = await caller.task.byId({ id }).catch((error: unknown) => {
 		// A malformed id fails validation; either way there is no such task.

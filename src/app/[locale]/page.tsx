@@ -9,7 +9,7 @@ import {
 } from "@/server/tasks/schema";
 import { getQueryClient, HydrateClient, trpc } from "@/trpc/server";
 
-export default function HomePage({ searchParams }: PageProps<"/">) {
+export default function HomePage({ searchParams }: PageProps<"/[locale]">) {
 	return (
 		<Stack>
 			<Title order={1}>Tasks</Title>
@@ -22,7 +22,7 @@ export default function HomePage({ searchParams }: PageProps<"/">) {
 
 async function PrefetchedTaskList({
 	searchParams,
-}: Pick<PageProps<"/">, "searchParams">) {
+}: Pick<PageProps<"/[locale]">, "searchParams">) {
 	const search = toSearchTerm((await searchParams).q);
 	// The list lives in memory and changes between requests, so render it per
 	// request. searchParams alone isn't enough: Next can prerender with them.
