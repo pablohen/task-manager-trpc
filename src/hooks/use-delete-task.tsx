@@ -8,6 +8,7 @@ import {
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { useRef } from "react";
 import type { Task, TaskPage } from "@/server/tasks/schema";
 import { useTRPC } from "@/trpc/client";
 
@@ -16,6 +17,8 @@ export function useDeleteTask() {
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const listKey = trpc.task.list.infiniteQueryKey();
+	// Ids with a delete in flight, so a double click can't send a second request.
+	const deleting = useRef(new Set<string>());
 
 	const { mutate } = useMutation(
 		trpc.task.delete.mutationOptions({
@@ -50,18 +53,27 @@ export function useDeleteTask() {
 			onSuccess: () => {
 				notifications.show({ color: "green", message: "Task deleted" });
 			},
-			onSettled: () => queryClient.invalidateQueries({ queryKey: listKey }),
+			onSettled: (_data, _error, { id }) => {
+				deleting.current.delete(id);
+				return queryClient.invalidateQueries({ queryKey: listKey });
+			},
 		}),
 	);
 
 	return (task: Task) =>
 		modals.openConfirmModal({
+			// A fixed id makes Mantine ignore a second open for the same task.
+			modalId: `delete-${task.id}`,
 			title: "Delete task",
 			children: (
 				<Text size="sm">“{task.title}” will be permanently removed.</Text>
 			),
 			labels: { confirm: "Delete", cancel: "Cancel" },
 			confirmProps: { color: "red" },
-			onConfirm: () => mutate({ id: task.id }),
+			onConfirm: () => {
+				if (deleting.current.has(task.id)) return;
+				deleting.current.add(task.id);
+				mutate({ id: task.id });
+			},
 		});
 }
