@@ -2,19 +2,22 @@ import type { Task, TaskInput, TaskPage } from "./schema";
 import { seedTasks } from "./seed";
 
 type Entry = { task: Task; seq: number };
+type StoreData = { entries: Map<string, Entry>; lastSeq: number };
 
 /**
  * In-memory task store. Every task gets an increasing sequence number and the
  * pagination cursor is that number, so a page boundary stays valid even if the
  * task it points at is deleted in the meantime.
  */
-export function createTaskStore(seed: Task[] = []) {
-	const entries = new Map<string, Entry>();
-	let lastSeq = 0;
+export function createTaskStore(
+	seed: Task[] = [],
+	data: StoreData = { entries: new Map(), lastSeq: 0 },
+) {
+	const { entries } = data;
 
 	const insert = (task: Task) => {
-		lastSeq += 1;
-		entries.set(task.id, { task, seq: lastSeq });
+		data.lastSeq += 1;
+		entries.set(task.id, { task, seq: data.lastSeq });
 		return task;
 	};
 
@@ -85,9 +88,16 @@ function matches(task: Task, term: string) {
 
 export type TaskStore = ReturnType<typeof createTaskStore>;
 
-// Pinned to globalThis so dev hot reloads don't wipe the list.
-const globalForStore = globalThis as { taskStore?: TaskStore };
+// Only the data is pinned to globalThis: dev hot reloads keep the list but
+// still pick up code changes. Seeding is lazy so it happens during a request,
+// not while Next prerenders a page that imports this module.
+const globalForStore = globalThis as { taskStoreData?: StoreData };
 
-globalForStore.taskStore ??= createTaskStore(seedTasks());
-
-export const taskStore = globalForStore.taskStore;
+export function getTaskStore() {
+	const seeded = globalForStore.taskStoreData !== undefined;
+	globalForStore.taskStoreData ??= { entries: new Map(), lastSeq: 0 };
+	return createTaskStore(
+		seeded ? [] : seedTasks(),
+		globalForStore.taskStoreData,
+	);
+}

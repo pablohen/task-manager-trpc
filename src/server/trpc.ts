@@ -1,12 +1,12 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError, z } from "zod";
-import { type TaskStore, taskStore } from "./tasks/store";
+import { getTaskStore, type TaskStore } from "./tasks/store";
 
 export type Context = { store: TaskStore };
 
 // The store comes through context so tests can swap in a fresh one.
-export const createContext = (): Context => ({ store: taskStore });
+export const createContext = (): Context => ({ store: getTaskStore() });
 
 const t = initTRPC.context<Context>().create({
 	// superjson keeps `createdAt` a Date on the client.
