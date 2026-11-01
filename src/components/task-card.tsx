@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useIntl } from "react-intl";
 import { useLocalizedPath } from "@/i18n/client";
 import type { Task } from "@/server/tasks/schema";
+import classes from "./task-card.module.css";
 
 export function TaskCard({
 	task,
@@ -16,12 +17,20 @@ export function TaskCard({
 }) {
 	const intl = useIntl();
 	const localize = useLocalizedPath();
+	const editHref = localize(`/tasks/${task.id}/edit`);
 
 	return (
-		<Card withBorder padding="md">
+		<Card withBorder padding="md" className={classes.card}>
 			<Group justify="space-between" align="flex-start" wrap="nowrap">
 				<Stack gap={4}>
-					<Text fw={600}>{task.title}</Text>
+					<Text
+						fw={600}
+						component={Link}
+						href={editHref}
+						className={classes.link}
+					>
+						{task.title}
+					</Text>
 					{task.description && (
 						<Text size="sm" c="dimmed" style={{ whiteSpace: "pre-wrap" }}>
 							{task.description}
@@ -41,11 +50,11 @@ export function TaskCard({
 						})}
 					</Text>
 				</Stack>
-				<Group gap={4} wrap="nowrap">
+				<Group gap={4} wrap="nowrap" className={classes.actions}>
 					<Tooltip label={intl.formatMessage({ id: "task.edit" })}>
 						<ActionIcon
 							component={Link}
-							href={localize(`/tasks/${task.id}/edit`)}
+							href={editHref}
 							variant="subtle"
 							aria-label={intl.formatMessage(
 								{ id: "task.editLabel" },
