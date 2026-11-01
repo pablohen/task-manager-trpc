@@ -9,6 +9,7 @@ A small task manager built with Next.js and tRPC. Tasks live in server memory, t
 - **Zod 4** for validation
 - **Mantine 9** for UI, with Phosphor icons
 - **react-hook-form** for the form
+- **react-intl** for localization (English, Portuguese, Spanish)
 - **Vitest** for tests, **Biome** for lint and format, **pnpm**
 
 ## Running it
@@ -17,7 +18,7 @@ Requires Node 20+ and pnpm.
 
 ```bash
 pnpm install
-pnpm dev        # http://localhost:3000
+pnpm dev        # http://localhost:3000 (redirects to /en, /pt or /es)
 ```
 
 Other scripts:
@@ -44,11 +45,13 @@ src/
   trpc/
     client.tsx        browser tRPC client + QueryClient provider
     server.tsx        server-side tRPC proxy for prefetching
+  i18n/               locales, message catalogs, server/client helpers
+  proxy.ts            redirects to a locale
   app/
-    page.tsx                 task list (SSR + infinite scroll)
-    tasks/new/page.tsx       create form
-    tasks/[id]/edit/page.tsx edit form
-    api/trpc/[trpc]/route.ts HTTP endpoint
+    [locale]/page.tsx                 task list (SSR + infinite scroll)
+    [locale]/tasks/new/page.tsx       create form
+    [locale]/tasks/[id]/edit/page.tsx edit form
+    api/trpc/[trpc]/route.ts          HTTP endpoint
 ```
 
 **Backend.** The router validates every input with Zod and reads from a store passed in through the tRPC context, so tests can use a fresh store. A missing task throws `NOT_FOUND` ("Task not found"). Invalid input returns `BAD_REQUEST` with a readable message and per-field errors (`data.zodError`), which the form shows next to the matching inputs.
@@ -60,6 +63,8 @@ src/
 **Delete.** Each delete asks for confirmation. The task is removed from the cache right away; on failure the list is restored and the server's error is shown.
 
 **Form.** A single `TaskForm` handles both create and edit. react-hook-form validates with the shared schema through `zodResolver`, so an empty or whitespace-only title is caught before any request is sent. Server errors are shown either inline on the matching field or as a notification. The submit button stays disabled while saving.
+
+**Localization.** Every page lives under a locale segment (`/en`, `/pt`, `/es`). `src/proxy.ts` redirects locale-less URLs using the language chosen in the header (a cookie) or the browser's `Accept-Language`. Server components translate with `getIntl()` (react-intl's `createIntl`, locale from `next/root-params`); client components use `IntlProvider`. Message ids are type-checked, and a test checks that every catalog has the same keys and that each message formats. Validation messages in the shared schema are message ids, so the API returns ids and the client shows them in the user's language.
 
 ## Decisions
 
