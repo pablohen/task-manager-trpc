@@ -79,6 +79,16 @@ describe("task router", () => {
 		expect((await caller.task.list({})).items).toEqual([]);
 	});
 
+	it("filters the list by search term", async () => {
+		const caller = setup();
+		await caller.task.create({ title: "Buy milk" });
+		await caller.task.create({ title: "Write report" });
+
+		const { items } = await caller.task.list({ search: "  MILK " });
+
+		expect(items.map((t) => t.title)).toEqual(["Buy milk"]);
+	});
+
 	it("rejects a malformed cursor", async () => {
 		await expect(setup().task.list({ cursor: "abc" })).rejects.toMatchObject({
 			code: "BAD_REQUEST",

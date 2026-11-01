@@ -14,6 +14,12 @@ export const taskRouter = router({
 			z.object({
 				limit: z.number().int().min(1).max(50).default(TASKS_PAGE_SIZE),
 				cursor: z.string().regex(/^\d+$/, "Invalid cursor").nullish(),
+				search: z
+					.string()
+					.trim()
+					.max(100)
+					.optional()
+					.transform((value) => value || undefined),
 			}),
 		)
 		.query(({ ctx, input }) => ctx.store.list(input)),

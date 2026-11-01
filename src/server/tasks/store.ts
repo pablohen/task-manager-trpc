@@ -24,13 +24,17 @@ export function createTaskStore(seed: Task[] = []) {
 		list({
 			limit,
 			cursor,
+			search,
 		}: {
 			limit: number;
 			cursor?: string | null;
+			search?: string;
 		}): TaskPage {
 			const before = cursor ? Number(cursor) : Number.POSITIVE_INFINITY;
+			const term = search?.toLowerCase();
 			const newer = [...entries.values()]
 				.filter((entry) => entry.seq < before)
+				.filter(({ task }) => !term || matches(task, term))
 				.sort((a, b) => b.seq - a.seq);
 			const page = newer.slice(0, limit);
 
@@ -70,6 +74,13 @@ export function createTaskStore(seed: Task[] = []) {
 			return entries.delete(id);
 		},
 	};
+}
+
+function matches(task: Task, term: string) {
+	return (
+		task.title.toLowerCase().includes(term) ||
+		(task.description?.toLowerCase().includes(term) ?? false)
+	);
 }
 
 export type TaskStore = ReturnType<typeof createTaskStore>;

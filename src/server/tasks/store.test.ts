@@ -54,6 +54,37 @@ describe("createTaskStore", () => {
 		expect(second.items.map((t) => t.title)).toEqual(["Task 1", "Task 0"]);
 	});
 
+	it("filters by title or description, case-insensitively", () => {
+		const store = createTaskStore();
+		store.create({ title: "Buy milk" });
+		store.create({ title: "Call mom", description: "About the MILK order" });
+		store.create({ title: "Write report" });
+
+		const { items } = store.list({ limit: 10, search: "milk" });
+
+		expect(items.map((t) => t.title)).toEqual(["Call mom", "Buy milk"]);
+	});
+
+	it("pages through search results", () => {
+		const store = createTaskStore();
+		for (let i = 0; i < 5; i++) {
+			store.create({ title: i % 2 === 0 ? `Match ${i}` : `Other ${i}` });
+		}
+
+		const first = store.list({ limit: 2, search: "match" });
+		const second = store.list({
+			limit: 2,
+			search: "match",
+			cursor: first.nextCursor,
+		});
+
+		expect(first.items.map((t) => t.title)).toEqual(["Match 4", "Match 2"]);
+		expect(second).toEqual({
+			items: [expect.objectContaining({ title: "Match 0" })],
+			nextCursor: null,
+		});
+	});
+
 	it("returns undefined when updating an unknown task", () => {
 		expect(
 			createTaskStore().update(crypto.randomUUID(), { title: "x" }),
